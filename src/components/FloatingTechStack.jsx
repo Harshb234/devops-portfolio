@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { gsap } from 'gsap';
 
 const TECHS = [
@@ -44,6 +44,15 @@ const FloatingTechStack = () => {
     const floatTLs = useRef([]);
     const magnetRef = useRef(null); // 🧲 custom cursor
     const isChaos = useRef(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile / touch
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
 
     // Build stable home positions
     const homes = useMemo(() => TECHS.map((_, i) => ({
@@ -56,6 +65,25 @@ const FloatingTechStack = () => {
         const magnet = magnetRef.current;
         if (!container) return;
 
+        // Skip interactive chaos on mobile — just gentle float
+        if (isMobile) {
+            badgeRefs.current.forEach((el, i) => {
+                if (!el) return;
+                const tl = gsap.timeline({ repeat: -1, yoyo: true, delay: sr(i * 3 + 6, 0, 3) });
+                tl.to(el, {
+                    x: sr(i * 5 + 7, -10, 10),
+                    y: sr(i * 5 + 8, -8, 8),
+                    rotation: sr(i * 5 + 9, -3, 3),
+                    duration: sr(i * 3 + 3, 5, 10),
+                    ease: 'sine.inOut',
+                });
+                floatTLs.current[i] = tl;
+            });
+
+            return () => floatTLs.current.forEach(tl => tl?.kill());
+        }
+
+        // Desktop: full interactive mode
         const W = () => container.offsetWidth;
         const H = () => container.offsetHeight;
 
@@ -179,8 +207,48 @@ const FloatingTechStack = () => {
             container.removeEventListener('mouseleave', onLeave);
             container.removeEventListener('mouseenter', onEnter);
         };
-    }, [homes]);
+    }, [homes, isMobile]);
 
+    // ── Mobile: render as a scrollable grid of badges ──
+    if (isMobile) {
+        return (
+            <div className="flex flex-col flex-1 min-h-0 gap-3">
+                {/* Category legend */}
+                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                    {[['Cloud', '#3b82f6'], ['DevOps', '#10b981'], ['Backend', '#f97316'], ['Frontend', '#a78bfa'], ['Tools', '#94a3b8']].map(([lbl, c]) => (
+                        <span key={lbl} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest" style={{ color: c }}>
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: c }} /> {lbl}
+                        </span>
+                    ))}
+                </div>
+
+                {/* Mobile: Wrapped badge grid with gentle float */}
+                <div
+                    ref={containerRef}
+                    className="flex flex-wrap gap-2 justify-center items-center py-2"
+                >
+                    {TECHS.map((tech, i) => (
+                        <span
+                            key={tech.label}
+                            ref={el => { badgeRefs.current[i] = el; }}
+                            className="select-none whitespace-nowrap text-[10px] sm:text-[11px] font-semibold px-2 py-1 rounded-full"
+                            style={{
+                                color: tech.color,
+                                background: `${tech.color}12`,
+                                border: `1px solid ${tech.color}40`,
+                                willChange: 'transform',
+                                transformOrigin: 'center center',
+                            }}
+                        >
+                            {tech.label}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // ── Desktop: full floating arena ──
     return (
         <div className="flex flex-col flex-1 min-h-0 gap-2">
             {/* Category legend */}

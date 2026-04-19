@@ -207,7 +207,7 @@ export default function DeploymentPipeline3D() {
     };
 
     return (
-        <div className="relative w-full h-full flex flex-col flex-1 min-h-[140px]">
+        <div className="relative w-full h-full flex flex-col flex-1 min-h-[120px] sm:min-h-[140px]">
 
             {/* GRID BACKGROUND PATTERN */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] rounded-xl"
@@ -218,13 +218,13 @@ export default function DeploymentPipeline3D() {
 
             {/* HEADER LABEL */}
             <div className="absolute top-0 right-0 z-10 pointer-events-none">
-                <span className="text-[10px] font-mono font-bold text-green-400">
+                <span className="text-[8px] sm:text-[10px] font-mono font-bold text-green-400">
                     CD_WORKFLOW: STABLE ✓
                 </span>
             </div>
 
             {/* 3D CANVAS PORTION */}
-            <div className="flex-1 min-h-[140px] relative z-0">
+            <div className="flex-1 min-h-[100px] sm:min-h-[140px] relative z-0">
                 <Canvas camera={{ position: [0, 0, 4.5], fov: 45 }} gl={{ antialias: true, alpha: true }}>
                     <Suspense fallback={null}>
                         <ambientLight intensity={0.5} />
@@ -236,13 +236,13 @@ export default function DeploymentPipeline3D() {
             </div>
 
             {/* TERMINAL LOGS OVERLAY */}
-            <div className="h-[75px] bg-black/30 rounded-lg px-4 py-2 mt-2 border border-white/5 z-10 font-mono text-[10px] flex flex-col justify-end shrink-0 relative overflow-hidden">
+            <div className="h-[60px] sm:h-[75px] bg-black/30 rounded-lg px-2 sm:px-4 py-1.5 sm:py-2 mt-1 sm:mt-2 border border-white/5 z-10 font-mono text-[9px] sm:text-[10px] flex flex-col justify-end shrink-0 relative overflow-hidden">
                 {/* Glow from the pipe above */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-2 bg-cyan-500/20 blur-xl pointer-events-none" />
 
-                <div className="flex flex-col gap-1 justify-end h-full">
+                <div className="flex flex-col gap-0.5 sm:gap-1 justify-end h-full">
                     {visibleLogs.map((log, i) => (
-                        <div key={i} className={`animate-fade-in-up leading-tight ${log.type === 'success' ? 'text-green-400' :
+                        <div key={i} className={`animate-fade-in-up leading-tight truncate ${log.type === 'success' ? 'text-green-400' :
                             log.type === 'warning' ? 'text-amber-400' :
                                 'text-white/70'
                             }`}>
@@ -250,7 +250,7 @@ export default function DeploymentPipeline3D() {
                         </div>
                     ))}
                     {isLive && (
-                        <div className="flex items-center gap-1.5 mt-1 animate-fade-in">
+                        <div className="flex items-center gap-1.5 mt-0.5 sm:mt-1 animate-fade-in">
                             <span className="relative flex h-1.5 w-1.5">
                                 <span className="animate-ping absolute h-full w-full rounded-full bg-green-400 opacity-75" />
                                 <span className="relative h-1.5 w-1.5 rounded-full bg-green-500 inline-flex" />

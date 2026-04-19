@@ -15,6 +15,7 @@ const BentoCard = ({
     gridRow,
     span = 'small',
     brewDelay = 0,
+    wide = false,
 }) => {
     // ── 3D tilt ──────────────────────────────────────────────────────────
     const { cardRef, shimmerRef } = useCoffeeTilt(10);
@@ -51,11 +52,12 @@ const BentoCard = ({
             ref={cardRef}
             onClick={handleClick}
             className={cn(
-                'relative overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-md flex flex-col group cursor-default',
+                'bento-card relative overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-md flex flex-col group cursor-default',
+                wide && 'bento-card--wide',
                 className
             )}
             style={{
-                padding: '1.5rem',
+                padding: 'clamp(1rem, 3vw, 1.5rem)',
                 boxShadow: '0 2px 24px -4px rgba(0,0,0,0.7)',
                 minHeight: minH,
                 gridColumn: gridCol ?? autoCol,
@@ -78,7 +80,7 @@ const BentoCard = ({
 
             {/* ── Header ── */}
             {title && (
-                <div className="flex items-center gap-2 mb-4 shrink-0">
+                <div className="flex items-center gap-2 mb-3 sm:mb-4 shrink-0">
                     {icon && <span className="opacity-60 text-blue-400">{icon}</span>}
                     <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-500">{title}</span>
                 </div>
